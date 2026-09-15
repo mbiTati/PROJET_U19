@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Test de Positionnement complet, Unit 1 + Unit 19</title>
+<style>
+  :root {
+    --teal: #0F766E;
+    --navy: #16294D;
+    --border: #E7E9EE;
+    --muted: #64707E;
+    --success: #4CAF50;
+    --error: #F44336;
+    --warning: #FF9800;
+    --page: #F1F5F4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--page);
+    padding: 20px;
+    margin: 0;
+    color: #12161C;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 4px 30px rgba(0,0,0,.08);
+  }
+  header {
+    background: linear-gradient(135deg, #16294D, #0F766E);
+    color: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  header .eyebrow {
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: #5EEAD4;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  header h1 { font-size: 24px; margin: 0 0 4px; }
+  header p { margin: 0; font-size: 13px; color: #B9C2CE; }
+  .info-box {
+    background: #FFF8E1;
+    border-left: 4px solid var(--warning);
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #5D4037;
+  }
+  .info-box strong { color: #E65100; }
+  section { margin-bottom: 36px; }
+  section h2 {
+    font-size: 16px;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  section h2 .points {
+    float: right;
+    font-size: 12px;
+    color: var(--muted);
+    background: #F1F5F4;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .question {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #FAFBFC;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    transition: all .2s;
+  }
+  .question.correct { background: #E8F5E9; border-color: var(--success); }
+  .question.wrong { background: #FFEBEE; border-color: var(--error); }
+  .question label.q-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .15s;
+  }
+  .options label:hover { border-color: var(--teal); }
+  .options input[type="radio"] { accent-color: var(--teal); }
+  .options label.selected { background: #E0F2F1; border-color: var(--teal); }
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
+  }
+  .code-block {
+    background: #1E1E2F;
+    color: #D4D4D4;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    margin: 10px 0;
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+  .code-block .keyword { color: #569CD6; }
+  .code-block .string { color: #CE9178; }
+  .code-block .number { color: #B5CEA8; }
+  .code-block .comment { color: #6A9955; }
+  .actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-primary { background: var(--teal); color: #fff; }
+  .btn-primary:hover { background: #0D5E57; }
+  .btn-reset { background: #E0E0E0; color: #333; }
+  .result {
+    margin-top: 24px;
+    padding: 28px;
+    border-radius: 12px;
+    background: var(--navy);
+    color: #fff;
+    text-align: center;
+    display: none;
+  }
+  .result.show { display: block; }
+  .result .score {
+    font-size: 56px;
+    font-weight: 800;
+    color: #5EEAD4;
+    margin: 8px 0;
+  }
+  .result .message { font-size: 15px; color: #B9C2CE; margin-bottom: 12px; }
+  .result .detail {
+    font-size: 13px;
+    color: #8FA2BF;
+    background: rgba(255,255,255,.05);
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 12px;
+    text-align: left;
+  }
+  .feedback {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .feedback.correct { color: var(--success); }
+  .feedback.wrong { color: var(--error); }
+  @media (max-width: 600px) {
+    .options { grid-template-columns: 1fr; }
+    .container { padding: 20px; }
+    .result .score { font-size: 42px; }
+  }
+
+  .name-box { margin-bottom: 20px; }
+  .name-box label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px; }
+  .feedback.info { color: var(--muted); font-weight: 400; font-style: italic; }
+  .btn-send { background: var(--navy); color: #fff; }
+  .part-divider { text-align:center; margin: 36px 0 20px; font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); border-top: 1px solid var(--border); padding-top: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="eyebrow">École Schulz Genève, Jour 1 + Passage Unit 1 vers Unit 19</div>
+    <h1>Test de Positionnement complet</h1>
+    <p>Partie A : Unit 1, Programming (80 points) suivie de la Partie B : prérequis Unit 19 (80 points), 160 points au total</p>
+  </header>
+
+  <div class="info-box">
+    <strong>Consignes :</strong> ce test sert à identifier votre niveau réel, il n'est pas noté pour la moyenne finale. L'orthographe du code n'est pas pénalisée si la logique est correcte et compréhensible. Répondez aux 10 sections dans l'ordre, puis cliquez sur <em>« Corriger mon test »</em> et sur <em>« Envoyer mes résultats »</em>.
+  </div>
+
+  <div class="name-box">
+    <label for="nomEleve">Nom et prénom :</label>
+    <input type="text" id="nomEleve" placeholder="Votre nom">
+  </div>
+
+  <div class="part-divider">Partie A, Unit 1 : Programming</div>
+
+<section>
+    <h2>Section 1 : QCM <span class="points">10 pts</span></h2>
+
+    <div class="question" id="q1">
+      <label class="q-label">1. Quel type Java utiliser pour stocker un nombre à virgule ?</label>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> a) double</label>
+        <label><input type="radio" name="q1" value="b"> b) String</label>
+        <label><input type="radio" name="q1" value="c"> c) int</label>
+        <label><input type="radio" name="q1" value="d"> d) boolean</label>
+      </div>
+      <div class="feedback" id="fb1"></div>
+    </div>
+
+    <div class="question" id="q2">
+      <label class="q-label">2. Après : <code>for(int i = 0; i &lt; 5; i++) { }</code>, que vaut i juste après la boucle ?</label>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> a) 6</label>
+        <label><input type="radio" name="q2" value="b"> b) 0</label>
+        <label><input type="radio" name="q2" value="c"> c) 4</label>
+        <label><input type="radio" name="q2" value="d"> d) 5</label>
+      </div>
+      <div class="feedback" id="fb2"></div>
+    </div>
+
+    <div class="question" id="q3">
+      <label class="q-label">3. Quelle structure stocke plusieurs valeurs du même type sous un seul nom ?</label>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> a) Une classe</label>
+        <label><input type="radio" name="q3" value="b"> b) Un tableau</label>
+        <label><input type="radio" name="q3" value="c"> c) Une variable</label>
+        <label><input type="radio" name="q3" value="d"> d) Une méthode</label>
+      </div>
+      <div class="feedback" id="fb3"></div>
+    </div>
+
+    <div class="question" id="q4">
+      <label class="q-label">4. Quel mot-clé crée une nouvelle instance d'une classe en Java ?</label>
+      <div class="options">
+        <label><input type="radio" name="q4" value="a"> a) new</label>
+        <label><input type="radio" name="q4" value="b"> b) static</label>
+        <label><input type="radio" name="q4" value="c"> c) void</label>
+        <label><input type="radio" name="q4" value="d"> d) class</label>
+      </div>
+      <div class="feedback" id="fb4"></div>
+    </div>
+
+    <div class="question" id="q5">
+      <label class="q-label">5. Que fait l'opérateur % en Java ?</label>
+      <div class="options">
+        <label><input type="radio" name="q5" value="a"> a) Une puissance</label>
+        <label><input type="radio" name="q5" value="b"> b) Une multiplication</label>
+        <label><input type="radio" name="q5" value="c"> c) Une division</label>
+        <label><input type="radio" name="q5" value="d"> d) Le reste de la division entière</label>
+      </div>
+      <div class="feedback" id="fb5"></div>
+    </div>
+
+    <div class="question" id="q6">
+      <label class="q-label">6. Une variable déclarée à l'intérieur d'une méthode est dite :</label>
+      <div class="options">
+        <label><input type="radio" name="q6" value="a"> a) locale</label>
+        <label><input type="radio" name="q6" value="b"> b) statique</label>
+        <label><input type="radio" name="q6" value="c"> c) publique</label>
+        <label><input type="radio" name="q6" value="d"> d) globale</label>
+      </div>
+      <div class="feedback" id="fb6"></div>
+    </div>
+
+    <div class="question" id="q7">
+      <label class="q-label">7. Quelle boucle exécute son bloc au moins une fois, même si la condition est fausse ?</label>
+      <div class="options">
+        <label><input type="radio" name="q7" value="a"> a) while</label>
+        <label><input type="radio" name="q7" value="b"> b) do-while</label>
+        <label><input type="radio" name="q7" value="c"> c) foreach</label>
+        <label><input type="radio" name="q7" value="d"> d) for</label>
+      </div>
+      <div class="feedback" id="fb7"></div>
+    </div>
+
+    <div class="question" id="q8">
+      <label class="q-label">8. Que retourne une méthode déclarée void ?</label>
+      <div class="options">
+        <label><input type="radio" name="q8" value="a"> a) Un entier</label>
+        <label><input type="radio" name="q8" value="b"> b) Un booléen</label>
+        <label><input type="radio" name="q8" value="c"> c) Rien</label>
+        <label><input type="radio" name="q8" value="d"> d) Un objet</label>
+      </div>
+      <div class="feedback" id="fb8"></div>
+    </div>
+
+    <div class="question" id="q9">
+      <label class="q-label">9. Quel opérateur teste l'égalité entre deux valeurs primitives en Java ?</label>
+      <div class="options">
+        <label><input type="radio" name="q9" value="a"> a) !=</label>
+        <label><input type="radio" name="q9" value="b"> b) .equals()</label>
+        <label><input type="radio" name="q9" value="c"> c) ==</label>
+        <label><input type="radio" name="q9" value="d"> d) =</label>
+      </div>
+      <div class="feedback" id="fb9"></div>
+    </div>
+
+    <div class="question" id="q10">
+      <label class="q-label">10. Un attribut déclaré private dans une classe est accessible :</label>
+      <div class="options">
+        <label><input type="radio" name="q10" value="a"> a) Uniquement dans le package</label>
+        <label><input type="radio" name="q10" value="b"> b) Uniquement dans la classe</label>
+        <label><input type="radio" name="q10" value="c"> c) Uniquement par héritage</label>
+        <label><input type="radio" name="q10" value="d"> d) Partout dans le programme</label>
+      </div>
+      <div class="feedback" id="fb10"></div>
+    </div>
+  </section>
+
+<section>
+    <h2>Section 2 : Trace d'exécution <span class="points">15 pts</span></h2>
+    <p style="font-size:13px;color:var(--muted)">Indiquez exactement ce qui s'affiche à l'écran.</p>
+
+    <div class="question" id="qT1">
+      <label class="q-label">2.1 (5 pts)</label>
+      <div class="code-block">int x = 7;
+int y = 2;
+System.out.println(x % y + x / y);</div>
+      <input type="text" id="ansT1" placeholder="Votre réponse">
+      <div class="feedback" id="fbT1"></div>
+    </div>
+
+    <div class="question" id="qT2">
+      <label class="q-label">2.2 (5 pts)</label>
+      <div class="code-block">int[] notes = {12, 15, 8, 20};
+int somme = 0;
+for (int i = 0; i &lt; notes.length; i++) {
+    somme = somme + notes[i];
+}
+System.out.println(somme);</div>
+      <input type="text" id="ansT2" placeholder="Votre réponse">
+      <div class="feedback" id="fbT2"></div>
+    </div>
+
+    <div class="question" id="qT3">
+      <label class="q-label">2.3 (5 pts)</label>
+      <div class="code-block">int age = 16;
+boolean majeur = age &gt;= 18;
+if (majeur) {
+    System.out.println("Accès autorisé");
+} else {
+    System.out.println("Accès refusé");
+}</div>
+      <input type="text" id="ansT3" placeholder="Votre réponse">
+      <div class="feedback" id="fbT3"></div>
+    </div>
+  </section>
+
+<section>
+    <h2>Section 3 : Pseudocode <span class="points">21 pts</span></h2>
+    <p style="font-size:13px;color:var(--muted)">Pas de vrai code Java ici : un algorithme clair, en étapes numérotées. Correction indicative par mots-clés (vérifiée ensuite par l'enseignante).</p>
+
+    <div class="question" id="qP1">
+      <label class="q-label">3.1 (7 pts) Algorithme qui trouve la valeur maximale d'un tableau de nombres.</label>
+      <textarea id="ansP1" placeholder="Votre algorithme..."></textarea>
+      <div class="feedback" id="fbP1"></div>
+    </div>
+
+    <div class="question" id="qP2">
+      <label class="q-label">3.2 (7 pts) Algorithme qui détermine si un nombre entier est premier.</label>
+      <textarea id="ansP2" placeholder="Votre algorithme..."></textarea>
+      <div class="feedback" id="fbP2"></div>
+    </div>
+
+    <div class="question" id="qP3">
+      <label class="q-label">3.3 (7 pts) Algorithme qui inverse l'ordre des caractères d'une chaîne.</label>
+      <textarea id="ansP3" placeholder="Votre algorithme..."></textarea>
+      <div class="feedback" id="fbP3"></div>
+    </div>
+  </section>
+
+<section>
+    <h2>Section 4 : Débogage <span class="points">14 pts</span></h2>
+
+    <div class="question" id="qD1">
+      <label class="q-label">4.1 (7 pts) Ce code doit afficher les nombres de 1 à 5. Quel est le bug et la correction ?</label>
+      <div class="code-block">for (int i = 1; i &lt; 5; i++) {
+    System.out.println(i);
+}</div>
+      <textarea id="ansD1" placeholder="Le bug est... la correction est..."></textarea>
+      <div class="feedback" id="fbD1"></div>
+    </div>
+
+    <div class="question" id="qD2">
+      <label class="q-label">4.2 (7 pts) Cette méthode doit retourner la somme de deux entiers. Quel est le bug et la correction ?</label>
+      <div class="code-block">public void addition(int a, int b) {
+    int somme = a + b;
+}</div>
+      <textarea id="ansD2" placeholder="Le bug est... la correction est..."></textarea>
+      <div class="feedback" id="fbD2"></div>
+    </div>
+  </section>
+
+<section>
+    <h2>Section 5 : Mini-conception orientée objet <span class="points">10 pts</span></h2>
+    <div class="question" id="qOO">
+      <label class="q-label">Un club de sport souhaite représenter ses membres. Un Membre possède : un nom (texte), un email (texte) et un niveau (nombre entier de 1 à 5). Écrivez le squelette de la classe Java Membre : attributs, constructeur, et une méthode getNom().</label>
+      <textarea id="answerOO" placeholder="public class Membre { ... }"></textarea>
+      <div class="feedback" id="fbOO"></div>
+    </div>
+  </section>
+
+<section>
+    <h2>Section 6 : Bonus, niveau Distinction <span class="points">10 pts</span></h2>
+    <div class="question" id="qBonus">
+      <label class="q-label">On vous propose deux méthodes pour chercher un nom dans une liste de 1000 membres : (A) parcourir tous les membres un par un ; (B) trier d'abord la liste puis faire une recherche dichotomique (binaire). Laquelle est la plus efficace si la recherche est effectuée très souvent ? Justifiez en une ou deux phrases.</label>
+      <textarea id="answerBonus" placeholder="Votre réponse..."></textarea>
+      <div class="feedback" id="fbBonus"></div>
+    </div>
+  </section>
+
+  <div class="part-divider">Partie B, prérequis Unit 19</div>
+
+<section>
+    <h2>Section 7 : QCM avancés (Unit 19) <span class="points">20 pts</span></h2>
+
+    <div class="question" id="v19_q1">
+      <label class="q-label">1. Que vaut <code>x</code> après cette boucle ?<br>
+      <span style="font-family:monospace">int x = 0; for(int i = 0; i &lt; 10; i += 2) { x += i; }</span></label>
+      <div class="options">
+        <label><input type="radio" name="v19_q1" value="a"> a) 30</label>
+        <label><input type="radio" name="v19_q1" value="b"> b) 20</label>
+        <label><input type="radio" name="v19_q1" value="c"> c) 45</label>
+        <label><input type="radio" name="v19_q1" value="d"> d) 25</label>
+      </div>
+      <div class="feedback" id="v19_fb1"></div>
+    </div>
+
+    <div class="question" id="v19_q2">
+      <label class="q-label">2. Quelle est la différence entre <code>String s1 = "abc";</code> et <code>String s2 = new String("abc");</code> en Java ?</label>
+      <div class="options">
+        <label><input type="radio" name="v19_q2" value="a"> a) s2 ne compile pas</label>
+        <label><input type="radio" name="v19_q2" value="b"> b) s1 est dans le pool de chaînes, s2 est un nouvel objet en mémoire</label>
+        <label><input type="radio" name="v19_q2" value="c"> c) Aucune, les deux sont identiques</label>
+        <label><input type="radio" name="v19_q2" value="d"> d) s1 est immuable, s2 est modifiable</label>
+      </div>
+      <div class="feedback" id="v19_fb2"></div>
+    </div>
+
+    <div class="question" id="v19_q3">
+      <label class="q-label">3. Que se passe-t-il si on exécute ce code ?<br>
+      <span style="font-family:monospace">int[] tab = new int[5]; System.out.println(tab[5]);</span></label>
+      <div class="options">
+        <label><input type="radio" name="v19_q3" value="a"> a) Affiche null</label>
+        <label><input type="radio" name="v19_q3" value="b"> b) Affiche 0</label>
+        <label><input type="radio" name="v19_q3" value="c"> c) Le code ne compile pas</label>
+        <label><input type="radio" name="v19_q3" value="d"> d) Lance une ArrayIndexOutOfBoundsException</label>
+      </div>
+      <div class="feedback" id="v19_fb3"></div>
+    </div>
+
+    <div class="question" id="v19_q4">
+      <label class="q-label">4. Quelle affirmation sur l'héritage Java est VRAIE ?</label>
+      <div class="options">
+        <label><input type="radio" name="v19_q4" value="a"> a) Une sous-classe peut accéder aux attributs privés de la super-classe</label>
+        <label><input type="radio" name="v19_q4" value="b"> b) Une classe peut hériter de plusieurs classes</label>
+        <label><input type="radio" name="v19_q4" value="c"> c) Le constructeur de la super-classe est toujours appelé automatiquement après celui de la sous-classe</label>
+        <label><input type="radio" name="v19_q4" value="d"> d) Une classe peut implémenter plusieurs interfaces</label>
+      </div>
+      <div class="feedback" id="v19_fb4"></div>
+    </div>
+
+    <div class="question" id="v19_q5">
+      <label class="q-label">5. Que fait l'opération <code>7 / 2</code> en Java si les deux sont des <code>int</code> ?</label>
+      <div class="options">
+        <label><input type="radio" name="v19_q5" value="a"> a) 3</label>
+        <label><input type="radio" name="v19_q5" value="b"> b) 4</label>
+        <label><input type="radio" name="v19_q5" value="c"> c) 3.5</label>
+        <label><input type="radio" name="v19_q5" value="d"> d) Une erreur de compilation</label>
+      </div>
+      <div class="feedback" id="v19_fb5"></div>
+    </div>
+
+    <div class="question" id="v19_q6">
+      <label class="q-label">6. Quelle est la complexité temporelle d'une recherche linéaire dans un tableau de n éléments (dans le pire cas) ?</label>
+      <div class="options">
+        <label><input type="radio" name="v19_q6" value="a"> a) O(n)</label>
+        <label><input type="radio" name="v19_q6" value="b"> b) O(1)</label>
+        <label><input type="radio" name="v19_q6" value="c"> c) O(n²)</label>
+        <label><input type="radio" name="v19_q6" value="d"> d) O(log n)</label>
+      </div>
+      <div class="feedback" id="v19_fb6"></div>
+    </div>
+
+    <div class="question" id="v19_q7">
+      <label class="q-label">7. Que renvoie cette méthode si on l'appelle avec <code>f(3)</code> ?<br>
+      <span style="font-family:monospace">public static int f(int n) { if (n &lt;= 1) return 1; return n * f(n - 1); }</span></label>
+      <div class="options">
+        <label><input type="radio" name="v19_q7" value="a"> a) 3</label>
+        <label><input type="radio" name="v19_q7" value="b"> b) 6</label>
+        <label><input type="radio" name="v19_q7" value="c"> c) 27</label>
+        <label><input type="radio" name="v19_q7" value="d"> d) 9</label>
+      </div>
+      <div class="feedback" id="v19_fb7"></div>
+    </div>
+
+    <div class="question" id="v19_q8">
+      <label class="q-label">8. Quelle est la différence entre <code>==</code> et <code>.equals()</code> pour les objets en Java ?</label>
+      <div class="options">
+        <label><input type="radio" name="v19_q8" value="a"> a) Aucune, les deux comparent le contenu</label>
+        <label><input type="radio" name="v19_q8" value="b"> b) == compare le contenu, .equals() compare les références</label>
+        <label><input type="radio" name="v19_q8" value="c"> c) == compare les références, .equals() compare le contenu (si redéfini)</label>
+        <label><input type="radio" name="v19_q8" value="d"> d) .equals() ne fonctionne que sur les String</label>
+      </div>
+      <div class="feedback" id="v19_fb8"></div>
+    </div>
+
+    <div class="question" id="v19_q9">
+      <label class="q-label">9. Que fait ce code ?<br>
+      <span style="font-family:monospace">int a = 5; int b = a++; System.out.println(a + " " + b);</span></label>
+      <div class="options">
+        <label><input type="radio" name="v19_q9" value="a"> a) 6 6</label>
+        <label><input type="radio" name="v19_q9" value="b"> b) 5 5</label>
+        <label><input type="radio" name="v19_q9" value="c"> c) 6 5</label>
+        <label><input type="radio" name="v19_q9" value="d"> d) 5 6</label>
+      </div>
+      <div class="feedback" id="v19_fb9"></div>
+    </div>
+
+    <div class="question" id="v19_q10">
+      <label class="q-label">10. Quelle structure de données est la plus adaptée pour vérifier rapidement si un élément existe (en O(1) en moyenne) ?</label>
+      <div class="options">
+        <label><input type="radio" name="v19_q10" value="a"> a) HashSet</label>
+        <label><input type="radio" name="v19_q10" value="b"> b) LinkedList</label>
+        <label><input type="radio" name="v19_q10" value="c"> c) TreeMap</label>
+        <label><input type="radio" name="v19_q10" value="d"> d) ArrayList</label>
+      </div>
+      <div class="feedback" id="v19_fb10"></div>
+    </div>
+  </section>
+
+<section>
+    <h2>Section 8 : Lecture de code (Unit 19) <span class="points">20 pts</span></h2>
+
+    <div class="question" id="v19_q11">
+      <label class="q-label">11. Que va afficher ce programme ? (5 pts)</label>
+      <div class="code-block">int[] tab = {1, 2, 3, 4, 5};
+for (int i = 0; i &lt; tab.length; i++) {
+    if (tab[i] % 2 == 0) {
+        System.out.print(tab[i] + " ");
+    }
+}</div>
+      <div class="options">
+        <label><input type="radio" name="v19_q11" value="a"> a) 1 3 5</label>
+        <label><input type="radio" name="v19_q11" value="b"> b) 1 2 3 4 5</label>
+        <label><input type="radio" name="v19_q11" value="c"> c) 2 4</label>
+        <label><input type="radio" name="v19_q11" value="d"> d) 0 2 4</label>
+      </div>
+      <div class="feedback" id="v19_fb11"></div>
+    </div>
+
+    <div class="question" id="v19_q12">
+      <label class="q-label">12. Que va afficher ce programme ? (5 pts)</label>
+      <div class="code-block">int x = 10;
+int y = 3;
+System.out.println(x % y + " " + x / y);</div>
+      <div class="options">
+        <label><input type="radio" name="v19_q12" value="a"> a) 3 1</label>
+        <label><input type="radio" name="v19_q12" value="b"> b) 3.33 1</label>
+        <label><input type="radio" name="v19_q12" value="c"> c) 1 3.33</label>
+        <label><input type="radio" name="v19_q12" value="d"> d) 1 3</label>
+      </div>
+      <div class="feedback" id="v19_fb12"></div>
+    </div>
+
+    <div class="question" id="v19_q13">
+      <label class="q-label">13. Que va afficher ce programme ? (5 pts)</label>
+      <div class="code-block">String s = "Java";
+for (int i = s.length() - 1; i &gt;= 0; i--) {
+    System.out.print(s.charAt(i));
+}</div>
+      <div class="options">
+        <label><input type="radio" name="v19_q13" value="a"> a) avaJ</label>
+        <label><input type="radio" name="v19_q13" value="b"> b) a</label>
+        <label><input type="radio" name="v19_q13" value="c"> c) Java</label>
+        <label><input type="radio" name="v19_q13" value="d"> d) J</label>
+      </div>
+      <div class="feedback" id="v19_fb13"></div>
+    </div>
+
+    <div class="question" id="v19_q14">
+      <label class="q-label">14. Que va afficher ce programme ? (5 pts)</label>
+      <div class="code-block">int i = 0;
+while (i &lt; 3) {
+    System.out.print(i + " ");
+    i++;
+}</div>
+      <div class="options">
+        <label><input type="radio" name="v19_q14" value="a"> a) 0 0 0</label>
+        <label><input type="radio" name="v19_q14" value="b"> b) 0 1 2</label>
+        <label><input type="radio" name="v19_q14" value="c"> c) 1 2 3</label>
+        <label><input type="radio" name="v19_q14" value="d"> d) 0 1 2 3</label>
+      </div>
+      <div class="feedback" id="v19_fb14"></div>
+    </div>
+  </section>
+
+<section>
+    <h2>Section 9 : Détection de bugs (Unit 19) <span class="points">20 pts</span></h2>
+
+    <div class="question" id="v19_q15">
+      <label class="q-label">15. Ce code devrait afficher les nombres de 1 à 5. Quel est le bug ? (5 pts)</label>
+      <div class="code-block">for (int i = 1; i &lt; 5; i++) {
+    System.out.println(i);
+}</div>
+      <div class="options">
+        <label><input type="radio" name="v19_q15" value="a"> a) Il faut initialiser i à 0</label>
+        <label><input type="radio" name="v19_q15" value="b"> b) Il n'y a pas de bug</label>
+        <label><input type="radio" name="v19_q15" value="c"> c) La condition devrait être i &lt;= 5</label>
+        <label><input type="radio" name="v19_q15" value="d"> d) Il faut utiliser i-- au lieu de i++</label>
+      </div>
+      <div class="feedback" id="v19_fb15"></div>
+    </div>
+
+    <div class="question" id="v19_q16">
+      <label class="q-label">16. Cette méthode devrait retourner la somme de deux entiers. Quel est le bug ? (5 pts)</label>
+      <div class="code-block">public void addition(int a, int b) {
+    int somme = a + b;
+}</div>
+      <div class="options">
+        <label><input type="radio" name="v19_q16" value="a"> a) void devrait être int et il manque return somme;</label>
+        <label><input type="radio" name="v19_q16" value="b"> b) Les paramètres sont mal nommés</label>
+        <label><input type="radio" name="v19_q16" value="c"> c) Il n'y a pas de bug</label>
+        <label><input type="radio" name="v19_q16" value="d"> d) Il manque un System.out.println</label>
+      </div>
+      <div class="feedback" id="v19_fb16"></div>
+    </div>
+
+    <div class="question" id="v19_q17">
+      <label class="q-label">17. Ce code devrait calculer la moyenne du tableau. Quel est le bug ? (5 pts)</label>
+      <div class="code-block">int[] notes = {10, 20, 30};
+int somme = 0;
+for (int i = 0; i &lt;= notes.length; i++) {
+    somme += notes[i];
+}
+double moyenne = somme / notes.length;</div>
+      <div class="options">
+        <label><input type="radio" name="v19_q17" value="a"> a) Il faut utiliser i-- dans la boucle</label>
+        <label><input type="radio" name="v19_q17" value="b"> b) Il manque un cast</label>
+        <label><input type="radio" name="v19_q17" value="c"> c) Il n'y a pas de bug</label>
+        <label><input type="radio" name="v19_q17" value="d"> d) La boucle dépasse les bornes (i &lt;= notes.length) et la division est entière</label>
+      </div>
+      <div class="feedback" id="v19_fb17"></div>
+    </div>
+
+    <div class="question" id="v19_q18">
+      <label class="q-label">18. Quelle affirmation sur ce code est VRAIE ? (5 pts)</label>
+      <div class="code-block">public class Compteur {
+    private int valeur = 0;
+    public void incrementer() {
+        valeur++;
+    }
+    public int getValeur() {
+        return valeur;
+    }
+}</div>
+      <div class="options">
+        <label><input type="radio" name="v19_q18" value="a"> a) valeur peut être modifié directement depuis l'extérieur</label>
+        <label><input type="radio" name="v19_q18" value="b"> b) L'encapsulation est respectée : valeur est privé, accessible via getValeur()</label>
+        <label><input type="radio" name="v19_q18" value="c"> c) Le code ne compile pas</label>
+        <label><input type="radio" name="v19_q18" value="d"> d) La méthode incrementer devrait être statique</label>
+      </div>
+      <div class="feedback" id="v19_fb18"></div>
+    </div>
+  </section>
+
+<section>
+    <h2>Section 10 : Mini-conception OO avancée (Unit 19) <span class="points">20 pts</span></h2>
+
+    <div class="question" id="v19_qOO">
+      <label class="q-label">19. (10 pts) Écrivez une classe Java <code>Etudiant</code> qui contient :<br>
+      • Un attribut <code>nom</code> (String, privé)<br>
+      • Un attribut <code>notes</code> (tableau d'entiers, privé)<br>
+      • Un constructeur qui initialise les deux<br>
+      • Une méthode <code>calculerMoyenne()</code> qui retourne la moyenne des notes (double)<br>
+      • Une méthode <code>estAdmis()</code> qui retourne true si la moyenne ≥ 10</label>
+      <textarea id="v19_answerOO" rows="12" placeholder="public class Etudiant {&#10;    // vos attributs ici&#10;    &#10;    // constructeur&#10;    &#10;    // calculerMoyenne()&#10;    &#10;    // estAdmis()&#10;}"></textarea>
+    </div>
+
+    <div class="question" id="v19_qAlgo">
+      <label class="q-label">20. (10 pts) Écrivez l'algorithme (en pseudocode ou Java) qui trouve le <strong>deuxième plus grand élément</strong> d'un tableau d'entiers, sans utiliser de tri. Complexité attendue : O(n).</label>
+      <textarea id="v19_answerAlgo" rows="10" placeholder="Exemple :&#10;1. Initialiser max1 et max2 à -infini&#10;2. Parcourir le tableau..."></textarea>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="corriger()">Corriger mon test</button>
+    <button class="btn btn-reset" onclick="reset()">Réinitialiser</button>
+  </div>
+
+  <div class="actions" style="display:flex;justify-content:center;margin:16px 0;">
+    <button class="btn btn-send" onclick="envoyerResultats()">Envoyer mes résultats à l'enseignante</button>
+  </div>
+
+  <div class="result" id="result">
+    <div>Votre score :</div>
+    <div class="score" id="scoreValue">0 / 160</div>
+    <div class="message" id="scoreMessage"></div>
+    <div class="detail" id="scoreDetail"></div>
+  </div>
+
+</div>
+
+<script>
+
+  // ---- Partie A : Unit 1 ----
+  const corrigeA = { q1:'a', q2:'d', q3:'b', q4:'a', q5:'d', q6:'a', q7:'b', q8:'c', q9:'c', q10:'b' };
+  const attenduT = { T1: ['4'], T2: ['55'], T3: ['accès refusé', 'acces refuse'] };
+  const motsClesP1 = ['max','premier','supérieur','superieur','comparer','parcourir','tableau','retourner'];
+  const motsClesP2 = ['premier','racine','diviseur','reste','%','boucle','retourner','faux','vrai'];
+  const motsClesP3 = ['inverser','dernière','derniere','caractère','caractere','position','boucle','résultat','resultat'];
+  const motsClesD1 = ['<=','i <= 5','condition','5'];
+  const motsClesD2 = ['void','int','return'];
+  const motsClesOO_A = ['class','membre','string','int','nom','email','niveau','private','public','getnom','return','constructeur'];
+  const motsClesBonus = ['b','tri','trier','dichotomique','binaire','log','o(log','souvent','répété','repete'];
+
+  // ---- Partie B : Unit 19 ----
+  const corrigeB = {
+    q1:'b', q2:'b', q3:'d', q4:'d', q5:'a', q6:'a', q7:'b', q8:'c', q9:'c', q10:'a',
+    q11:'c', q12:'d', q13:'a', q14:'b', q15:'c', q16:'a', q17:'d', q18:'b'
+  };
+  function ptsQuestionB(i) { return i <= 10 ? 2 : 5; }
+  const motsClesOO_B = ['class','etudiant','string','int','nom','notes','private','public','return','calculermoyenne','estadmis','constructeur','double'];
+  const motsClesAlgo_B = ['max1','max2','deuxième','deuxieme','parcourir','for','if','tableau','initialiser','comparer','o(n)','complexité'];
+
+  function scoreMots(reponse, motsCles, maxPts) {
+    if (!reponse || reponse.trim().length < 5) return 0;
+    const r = reponse.toLowerCase();
+    let hits = 0;
+    motsCles.forEach(m => { if (r.includes(m.toLowerCase())) hits++; });
+    return Math.min(maxPts, Math.round(hits * maxPts / Math.max(3, motsCles.length * 0.6)));
+  }
+
+  function marquer(id, fbId, ok, texteOk, texteKo) {
+    const q = document.getElementById(id);
+    const fb = document.getElementById(fbId);
+    q.classList.remove('correct','wrong');
+    fb.classList.remove('correct','wrong','info');
+    if (ok) { q.classList.add('correct'); fb.textContent = texteOk; fb.classList.add('correct'); }
+    else { q.classList.add('wrong'); fb.textContent = texteKo; fb.classList.add('wrong'); }
+  }
+
+  function corriger() {
+    let score = 0;
+    const total = 160;
+
+    // --- Partie A : QCM (Q1-10, 1 pt chacun) ---
+    for (let i = 1; i <= 10; i++) {
+      const selected = document.querySelector(`input[name="q${i}"]:checked`);
+      const bonne = corrigeA['q' + i];
+      if (selected && selected.value === bonne) {
+        score += 1;
+        marquer('q'+i, 'fb'+i, true, 'Correct (+1 pt)', '');
+      } else {
+        marquer('q'+i, 'fb'+i, false, '', selected ? `Incorrect. Bonne réponse : ${bonne}` : 'Non répondu');
+      }
+    }
+
+    // --- Partie A : Trace d'exécution ---
+    ['T1','T2','T3'].forEach(k => {
+      const val = document.getElementById('ans'+k).value.trim().toLowerCase();
+      const ok = attenduT[k].some(a => val.includes(a));
+      if (ok) score += 5;
+      marquer('q'+k, 'fb'+k, ok, 'Correct (+5 pts)', `Réponse attendue : ${attenduT[k][0]}`);
+    });
+
+    // --- Partie A : Pseudocode (indicatif) ---
+    const p1 = scoreMots(document.getElementById('ansP1').value, motsClesP1, 7);
+    const p2 = scoreMots(document.getElementById('ansP2').value, motsClesP2, 7);
+    const p3 = scoreMots(document.getElementById('ansP3').value, motsClesP3, 7);
+    score += p1 + p2 + p3;
+    ['fbP1','fbP2','fbP3'].forEach((id,idx) => {
+      const val = [p1,p2,p3][idx];
+      document.getElementById(id).textContent = `Score indicatif : ${val}/7 (vérifié ensuite par l'enseignante)`;
+      document.getElementById(id).className = 'feedback info';
+    });
+
+    // --- Partie A : Débogage (indicatif) ---
+    const d1 = scoreMots(document.getElementById('ansD1').value, motsClesD1, 7);
+    const d2 = scoreMots(document.getElementById('ansD2').value, motsClesD2, 7);
+    score += d1 + d2;
+    document.getElementById('fbD1').textContent = `Score indicatif : ${d1}/7 (vérifié ensuite par l'enseignante)`;
+    document.getElementById('fbD1').className = 'feedback info';
+    document.getElementById('fbD2').textContent = `Score indicatif : ${d2}/7 (vérifié ensuite par l'enseignante)`;
+    document.getElementById('fbD2').className = 'feedback info';
+
+    // --- Partie A : POO + Bonus (indicatif) ---
+    const ooA = scoreMots(document.getElementById('answerOO').value, motsClesOO_A, 10);
+    score += ooA;
+    document.getElementById('fbOO').textContent = `Score indicatif : ${ooA}/10 (vérifié ensuite par l'enseignante)`;
+    document.getElementById('fbOO').className = 'feedback info';
+
+    const bonus = scoreMots(document.getElementById('answerBonus').value, motsClesBonus, 10);
+    score += bonus;
+    document.getElementById('fbBonus').textContent = `Score indicatif : ${bonus}/10 (vérifié ensuite par l'enseignante)`;
+    document.getElementById('fbBonus').className = 'feedback info';
+
+    // --- Partie B : QCM (v19_q1 à v19_q18) ---
+    for (let i = 1; i <= 18; i++) {
+      const q = document.getElementById('v19_q' + i);
+      const fb = document.getElementById('v19_fb' + i);
+      const selected = document.querySelector(`input[name="v19_q${i}"]:checked`);
+      const bonne = corrigeB['q' + i];
+      const pts = ptsQuestionB(i);
+
+      q.classList.remove('correct','wrong');
+      fb.classList.remove('correct','wrong');
+
+      if (selected && selected.value === bonne) {
+        score += pts;
+        q.classList.add('correct');
+        fb.textContent = `Correct (+${pts} pts)`;
+        fb.classList.add('correct');
+      } else {
+        q.classList.add('wrong');
+        fb.textContent = selected ? `Incorrect. Bonne réponse : ${bonne}` : 'Non répondu';
+        fb.classList.add('wrong');
+      }
+    }
+
+    // --- Partie B : POO avancée + Algo (indicatif) ---
+    const answerOOB = document.getElementById('v19_answerOO').value.toLowerCase();
+    const ooB = Math.min(10, Math.round(
+      motsClesOO_B.filter(m => answerOOB.includes(m.toLowerCase())).length * 10 / motsClesOO_B.length
+    ));
+    score += ooB;
+    const qOOB = document.getElementById('v19_qOO');
+    qOOB.classList.remove('correct','wrong');
+    if (ooB >= 7) qOOB.classList.add('correct');
+    else if (answerOOB.length > 30) qOOB.classList.add('wrong');
+
+    const answerAlgoB = document.getElementById('v19_answerAlgo').value.toLowerCase();
+    const algoB = Math.min(10, Math.round(
+      motsClesAlgo_B.filter(m => answerAlgoB.includes(m.toLowerCase())).length * 10 / motsClesAlgo_B.length
+    ));
+    score += algoB;
+    const qAlgoB = document.getElementById('v19_qAlgo');
+    qAlgoB.classList.remove('correct','wrong');
+    if (algoB >= 6) qAlgoB.classList.add('correct');
+    else if (answerAlgoB.length > 30) qAlgoB.classList.add('wrong');
+
+    // --- Affichage global ---
+    document.getElementById('scoreValue').textContent = `${score} / ${total}`;
+
+    let message = '';
+    let detail = '';
+    if (score >= 128) {
+      message = 'Excellent niveau sur l\'ensemble du test.';
+      detail = 'Les bases d\'Unit 1 et les prérequis d\'Unit 19 sont solides. Les structures de données avancées (HashMap, PriorityQueue, BFS, Big O) seront abordables sans difficulté.';
+    } else if (score >= 96) {
+      message = 'Bon niveau global, quelques révisions ciblées utiles.';
+      detail = 'Les bases sont là, mais certaines notions gagnent à être consolidées avant de commencer Unit 19. Repérez les sections où le score est le plus faible.';
+    } else if (score >= 64) {
+      message = 'Niveau intermédiaire, révisions nécessaires avant Unit 19.';
+      detail = 'Des lacunes sur les fondamentaux vont freiner la suite. Priorité : tableaux, boucles, POO (classes, encapsulation) et complexité algorithmique.';
+    } else {
+      message = 'Niveau insuffisant pour démarrer Unit 19 sereinement.';
+      detail = 'Il est nécessaire de revoir les fondamentaux de Java (types, boucles, conditions, tableaux, classes) avant d\'aborder les structures de données avancées.';
+    }
+
+    document.getElementById('scoreMessage').textContent = message;
+    document.getElementById('scoreDetail').textContent = detail;
+    document.getElementById('result').classList.add('show');
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+    window.dernierScore = `${score} / ${total}`;
+  }
+
+  function reset() {
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[type="text"], textarea').forEach(el => { if (el.id !== 'nomEleve') el.value = ''; });
+    document.querySelectorAll('.question').forEach(q => q.classList.remove('correct','wrong'));
+    document.querySelectorAll('.feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; });
+    document.getElementById('result').classList.remove('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function envoyerResultats() {
+    const nom = document.getElementById('nomEleve').value.trim() || '(nom non renseigné)';
+    const score = window.dernierScore || document.getElementById('scoreValue').textContent;
+    let corps = `Nom : ${nom}\nScore : ${score}\n\n--- Partie A, Unit 1 ---\n\n`;
+    corps += `Trace d'exécution:\n`;
+    ['T1','T2','T3'].forEach(k => corps += `  ${k}: ${document.getElementById('ans'+k).value}\n`);
+    corps += `\nPseudocode:\n  3.1: ${document.getElementById('ansP1').value}\n  3.2: ${document.getElementById('ansP2').value}\n  3.3: ${document.getElementById('ansP3').value}\n`;
+    corps += `\nDébogage:\n  4.1: ${document.getElementById('ansD1').value}\n  4.2: ${document.getElementById('ansD2').value}\n`;
+    corps += `\nPOO:\n  ${document.getElementById('answerOO').value}\n`;
+    corps += `\nBonus:\n  ${document.getElementById('answerBonus').value}\n`;
+    corps += `\n--- Partie B, prérequis Unit 19 ---\n\n`;
+    corps += `Classe Etudiant:\n  ${document.getElementById('v19_answerOO').value}\n`;
+    corps += `\n2e plus grand élément:\n  ${document.getElementById('v19_answerAlgo').value}\n`;
+
+    const sujet = encodeURIComponent(`Test de positionnement complet - ${nom}`);
+    const corpsEncode = encodeURIComponent(corps);
+    window.location.href = `mailto:mbi.tatiana@gmail.com?subject=${sujet}&body=${corpsEncode}`;
+  }
+
+  document.querySelectorAll('input[type="radio"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const name = e.target.name;
+      document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
+        const lbl = inp.closest('label');
+        if (lbl) lbl.classList.remove('selected');
+      });
+      const lbl = e.target.closest('label');
+      if (lbl) lbl.classList.add('selected');
+    });
+  });
+
+</script>
+</body>
+</html>
